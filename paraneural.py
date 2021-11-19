@@ -34,18 +34,18 @@ exampleHyperParams = {
     }
 }
 
-def buildNeuralNet(
+def buildAll(
         hParams= exampleHyperParams,
         verbose=True
     ):
     dataset = getDataset(#datasetPreparers=getDatasetPreparers(),                    datasetName="mnist")
         )
     model = makeModel(**hParams["model"])
-    trainedModel, trainResults =  trainModel(model, dataset["train"], **hParams["train"])
+    trainFunction = lambda **x: trainModel(model, dataset["train"], **hParams["train"], **x)
     testFunction = lambda **x: testModel(trainedModel, dataset["test"], **x) 
     #testResults = testModel(trainedModel, dataset["test"], **hParams["test"])
     #if verbose: print(hParams, trainResults,testResults, trainedModel)
-    return trainedModel, testFunction ,trainResults
+    return testFunction, trainFunction, model
 
 def getDataset(datasetPreparers = [(lambda x: x),( lambda x: x)], datasetName="mnist"):
 #   eval(f"import datasets.{datasetName} as dsModule")

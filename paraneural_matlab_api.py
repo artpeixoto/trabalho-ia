@@ -1,8 +1,9 @@
 import paraneural
-from timeit import timeit
+from timeit import Timer
 import enum
 import itertools as itert
 #nesse modulo, testamos os algoritmos de paraneural, alterando o parametros das redes neurais. Os parametros sao codificados em genes e otimizados por algoritmos geneticos
+
 def getLog():
     import logging
     logger = logging.getLogger()
@@ -51,11 +52,15 @@ def parseDna(dna): #recebe uma lista de inteiros e transforma em genes que o mod
 
 
 def evaluateTest(testFunction):
-    timer = timeit(number=1)
-    timer.start()
-    results = testFunction()
-    timer.stop()
-    return results
+    return testFunction()
+
+def evaluateTrain(trainFunction):
+    import timeit
+    start_time = timeit.default_timer()
+    results = trainFunction()
+    end_time = timeit.default_timer()
+    delta_time = end_time - start_time
+    return results, delta_time
 
 def main(dna: bytearray):
     logger = getLog()
@@ -63,11 +68,15 @@ def main(dna: bytearray):
     hParams = parseDna(dna)
     
     logger.debug(f"Building neuralNetwork...")
-    model, testFunction, trainResults = paraneural.buildNeuralNet(hParams)
+    testFunction, trainFunction, model= paraneural.buildAll(hParams)
     
-    logger.debug(f"Gotten these results:\n\tmodel:{model}\n\ttrain results: {trainResults}")
     logger.info("Evaluating this individual")
+    trainRes = evaluateTrain(trainFunction)
+    testRes = evaluateTest(testFunction)
     
-    finalResults = evaluateTest(testFunction)
-    logger.info(f"Results:\n\t{finalResults}")
+    logger.info(f"Results:\n\t{trainRes, testRes}")
     return locals()
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1:])
