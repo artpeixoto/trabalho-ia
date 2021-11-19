@@ -42,9 +42,7 @@ def buildAll(
         )
     model = makeModel(**hParams["model"])
     trainFunction = lambda **x: trainModel(model, dataset["train"], **hParams["train"], **x)
-    testFunction = lambda **x: testModel(trainedModel, dataset["test"], **x) 
-    #testResults = testModel(trainedModel, dataset["test"], **hParams["test"])
-    #if verbose: print(hParams, trainResults,testResults, trainedModel)
+    testFunction = lambda **x: testModel(model, dataset["test"], **x) 
     return testFunction, trainFunction, model
 
 def getDataset(datasetPreparers = [(lambda x: x),( lambda x: x)], datasetName="mnist"):

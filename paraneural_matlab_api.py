@@ -7,6 +7,7 @@ import itertools as itert
 def getLog():
     import logging
     logger = logging.getLogger()
+    logger.addHandler(logging.StreamHandler())
     logger.setLevel(logging.DEBUG)
     return logger
 
@@ -14,41 +15,42 @@ def parseDna(dna): #recebe uma lista de inteiros e transforma em genes que o mod
     def parseTrainGenes(epochs, batchSize, use_multiprocessing, workers):
         return {
             "epochs" : epochs,
-            "batchSize" : 2**n,
+            "batch_size" : 2**batchSize,
             "use_multiprocessing" : use_multiprocessing != 0,
             "workers" : workers
         }
-    def parseLayerGenes(n_units, activation):
-        return {
-            "n_units" : n_units,
-            "activation" : [
-                "relu",
-                "leaky_relu",
-                "sigmoid",
-                "softmax",
-                "softplus",
-                "tanh",
-                "hard_sigmoid",
-                "exponential"
-            ] [activation]
-        }
+    def parseLayerGenes(units, activation):
+        return (
+            "Dense" #unica suportavel por enquanto
+            ,
+            {   "units" : units,
+                "activation" : [
+                    "relu",
+                    "leaky_relu",
+                    "sigmoid",
+                    "softmax",
+                    "softplus",
+                    "tanh",
+                    "hard_sigmoid",
+                    "exponential"
+                ] [activation]
+            })
     def parseOptimizer(optimizer):
-        return {
-            "optimizer" : [
+        return [
                 "adadelta",
                 "adagrad",
                 "adam",
                 "adamax"
             ][optimizer]
-    }
+    
     hParams = {
-        "train": parseTrainGenes(dna[:4]),
+        "train": parseTrainGenes(*dna[0:4]),
         "model": {
             "layersArgs" : [parseLayerGenes(dna[4+ i*2], dna[4+ i*2 + 1]) for i in range(4)],
             "optimizer" : parseOptimizer(dna[12])
         }
     }
-    #temos 13 genes, os 4 primeiros servem para definir as caracteristicas do processo de treinamentos
+    return hParams
 
 
 def evaluateTest(testFunction):
@@ -64,13 +66,13 @@ def evaluateTrain(trainFunction):
 
 def main(dna: bytearray):
     logger = getLog()
-    logger.debug(f"Parsing DNA: {dna}")
+    logger.info(f"Parsing DNA: {dna}")
     hParams = parseDna(dna)
+    logger.info(f"hyperparameters: {hParams}")
+    logger.info(f"Building neuralNetwork...")
+    testFunction, trainFunction, model = paraneural.buildAll(hParams)
     
-    logger.debug(f"Building neuralNetwork...")
-    testFunction, trainFunction, model= paraneural.buildAll(hParams)
-    
-    logger.info("Evaluating this individual")
+    logger.info("Evaluating individual")
     trainRes = evaluateTrain(trainFunction)
     testRes = evaluateTest(testFunction)
     
@@ -79,4 +81,12 @@ def main(dna: bytearray):
 
 if __name__ == "__main__":
     import sys
-    main(sys.argv[1:])
+    if len(sys.argv) > 1:
+        main(sys.argv[1:])
+    else:
+        main([  0x0A, 0x05, 0x01, 0x08,
+                0x40, 0x01,
+                0x80, 0x01, 
+                0x40, 0x02, 
+                0x40, 0x02, 
+                0x01])
