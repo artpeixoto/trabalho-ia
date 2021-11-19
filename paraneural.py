@@ -38,12 +38,13 @@ def buildAll(
         hParams= exampleHyperParams,
         verbose=True
     ):
-    dataset = getDataset(#datasetPreparers=getDatasetPreparers(),                    datasetName="mnist")
-        )
+    dataset = getDataset(
+        #datasetPreparers=getDatasetPreparers(),                    
+        datasetName="mnist")
     model = makeModel(**hParams["model"])
     trainFunction = lambda **x: trainModel(model, dataset["train"], **hParams["train"], **x)
     testFunction = lambda **x: testModel(model, dataset["test"], **x) 
-    return testFunction, trainFunction, model
+    return testFunction, trainFunction, model, dataset
 
 def getDataset(datasetPreparers = [(lambda x: x),( lambda x: x)], datasetName="mnist"):
 #   eval(f"import datasets.{datasetName} as dsModule")
@@ -87,14 +88,15 @@ def makeModel(layersArgs=[
     model.compile(optimizer=optimizer, loss=loss)
     return model
 
-def trainModel(model: keras.Sequential, 
+def trainModel(
+        model: keras.Sequential, 
         train_dataset,
         use_multiprocessing=True,
         **kwargs
     ):
     from copy import deepcopy
     xTrain, yTrain = train_dataset
-    results = model.fit(x=xTrain,y=yTrain,
+    results = model.fit(x=xTrain, y=yTrain,
                         use_multiprocessing=use_multiprocessing,
                         **kwargs)
     return model, results

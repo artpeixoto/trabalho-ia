@@ -1,4 +1,4 @@
-%Implementação do SIAD-AG (Aplicação 1)
+%Implementação do SIAD-AG (Aplicação 2)
 %Código MatLab:
 
 clear all
@@ -7,9 +7,10 @@ clc
 
 %% Definindo o range das variáveis
 
-epochs = [0 1000]; % Limites da variável "x"
-batchSize = [0 1000]; % Limites da variável "x"
-pC = [0 1000]; % Limites da variável "x"
+epochs = [1 16]; 
+batchSize = [1 10]; 
+use_multiprocessing = [0 1];
+workers = [1 8]; 
 
 LB = [pA(1) pB(1) pC(1)]; %Limite inferior
 UB = [pA(2) pB(2) pC(2)]; %Limite Superior

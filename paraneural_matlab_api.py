@@ -42,13 +42,14 @@ def parseDna(dna): #recebe uma lista de inteiros e transforma em genes que o mod
                 "adam",
                 "adamax"
             ][optimizer]
-    
+    #TODO: reestruturar de forma que aceite qualquer tamanho de gene (tamanhos maiores levam a redes maiores?)
+    #TODO:
     hParams = {
         "train": parseTrainGenes(*dna[0:4]),
         "model": {
             "layersArgs" : [parseLayerGenes(dna[4+ i*2], dna[4+ i*2 + 1]) for i in range(4)],
             "optimizer" : parseOptimizer(dna[12])
-        }
+        } 
     }
     return hParams
 
@@ -70,13 +71,13 @@ def main(dna: bytearray):
     hParams = parseDna(dna)
     logger.info(f"hyperparameters: {hParams}")
     logger.info(f"Building neuralNetwork...")
-    testFunction, trainFunction, model = paraneural.buildAll(hParams)
+    testFunction, trainFunction, model, dataset = paraneural.buildAll(hParams)
     
     logger.info("Evaluating individual")
     trainRes = evaluateTrain(trainFunction)
     testRes = evaluateTest(testFunction)
     
-    logger.info(f"Results:\n\t{trainRes, testRes}")
+    logger.info(f"Results:\n\tTraining: {trainRes}\n\tTesting: {testRes}")
     return locals()
 
 if __name__ == "__main__":
@@ -84,9 +85,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         main(sys.argv[1:])
     else:
-        main([  0x0A, 0x05, 0x01, 0x08,
-                0x40, 0x01,
-                0x80, 0x01, 
-                0x40, 0x02, 
-                0x40, 0x02, 
-                0x01])
+        main(
+            [0x10, 0x06, 0x01, 0x10,
+            0x60, 0x01,
+            0xFF, 0x01, 
+            0x40, 0x05, 
+            0x40, 0x01, 
+            0x01])
