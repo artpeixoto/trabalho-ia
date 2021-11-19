@@ -1,4 +1,4 @@
-module Infrastructure (
+module TrabalhoIaGa.Infrastructure (
     Gene, Dna, Population, Mask, MaskGene, Score, 
     selectIndividuals, crossover, makeMask,  
 ) where
