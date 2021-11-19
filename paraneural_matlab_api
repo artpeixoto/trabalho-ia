@@ -1,3 +1,48 @@
 import paraneural
+from timeit import timeit
+import enum
+#nesse modulo, testamos os algoritmos de paraneural, alterando o parametros das redes neurais. Os parametros sao codificados em genes e otimizados por algoritmos geneticos
 
-#nesse modulo, testamos 
+def parseGenes(): #recebe uma lista de inteiros e transforma em genes que o modulo paraneural pode entender
+    
+    def parseTrainGenes(epochs, batchSize, use_multiprocessing, workers):
+        return {
+            "epochs" : epochs,
+            "batchSize" : 2**n,
+            "use_multiprocessing" : use_multiprocessing != 0,
+            "workers" : workers
+        }
+    def parseLayerGenes(n_units, activation):
+        return {
+            "n_units" : n_units,
+            "activation" : [
+                "relu",
+                "leaky_relu",
+                "sigmoid",
+                "softmax",
+                "softplus",
+                "tanh",
+                "hard_sigmoid",
+                "exponential"
+            ] [activation]
+        }
+    def parseOptimizer(optimizer):
+        return {
+            "optimizer" : [
+                "adadelta",
+                "adagrad",
+                "adam",
+                "adamax"
+            ][optimizer]
+    }
+    
+    #temos 13 genes, os 4 primeiros servem para definir as caracteristicas do 
+
+def evaluateTest(testFunction):
+    timer = timeit(number=1)
+    timer.start()
+    testFunction()
+    timer.stop()
+    
+def main():
+    model, testFunction, trainResults = paraneural.buildNeuralNet(hParams)

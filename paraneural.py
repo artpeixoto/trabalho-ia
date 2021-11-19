@@ -30,20 +30,22 @@ exampleHyperParams = {
             ("Dense", {"units": 32, "activation":"ReLU"}),          #gen9, 10
             ("Dense", {"units": 10, "activation":"log_softmax"})    #gen11, 12
         ], "optimizer": "adam"                                      #gen13
-        ,  "loss" : "SparseCategoricalCrossentropy"                 #gen14
+        ,  "loss" : "SparseCategoricalCrossentropy"                 #gen14 mas nao posso mudar
     }
 }
 
-def main(hParams= exampleHyperParams,
+def buildNeuralNet(
+        hParams= exampleHyperParams,
         verbose=True
     ):
     dataset = getDataset(#datasetPreparers=getDatasetPreparers(),                    datasetName="mnist")
         )
     model = makeModel(**hParams["model"])
     trainedModel, trainResults =  trainModel(model, dataset["train"], **hParams["train"])
-    testResults = testModel(trainedModel, dataset["test"], **hParams["test"])
-    if verbose: print(hParams, trainResults,testResults, trainedModel)
-    return vars()
+    testFunction = lambda **x: testModel(trainedModel, dataset["test"], **x) 
+    #testResults = testModel(trainedModel, dataset["test"], **hParams["test"])
+    #if verbose: print(hParams, trainResults,testResults, trainedModel)
+    return trainedModel, testFunction ,trainResults
 
 def getDataset(datasetPreparers = [(lambda x: x),( lambda x: x)], datasetName="mnist"):
 #   eval(f"import datasets.{datasetName} as dsModule")
@@ -69,12 +71,14 @@ def getDatasetPreparers():
 
 
 def makeModel(layersArgs=[
-        ("Dense", {"units": 64, "activation":"ReLU"}),
-        ("Dense", {"units": 128,"activation":"ReLU"}),
-        ("Dense", {"units": 32,"activation":"ReLU"}),
-        ("Dense", {"units": 10,"activation":"log_softmax"})
-      ],optimizer=keras.optimizers.adagrad_v2.Adagrad(),
-        loss=keras.losses.SparseCategoricalCrossentropy()):
+            ("Dense", {"units": 64, "activation":"ReLU"}),
+            ("Dense", {"units": 128,"activation":"ReLU"}),
+            ("Dense", {"units": 32,"activation":"ReLU"}),
+            ("Dense", {"units": 10,"activation":"log_softmax"})
+        ],  optimizer="adagrad_v2",
+            loss="SparseCategoricalCrossentropy"
+    ):
+
     layers = [eval(f"keras.layers.{layerName}") (**parm) for (layerName, parm) in layersArgs]
     model = keras.Sequential([
                 keras.layers.InputLayer((28,28)), #TODO: colocar batch_size como parametro do algoritmo genetico
@@ -105,5 +109,3 @@ def testModel(model: keras.Sequential,
 
 
 
-if __name__ == "__main__":
-    main()
