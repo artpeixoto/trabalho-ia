@@ -75,13 +75,13 @@ def makeModel(layersArgs=[
             ("Dense", {"units": 128,"activation":"ReLU"}),
             ("Dense", {"units": 32,"activation":"ReLU"}),
             ("Dense", {"units": 10,"activation":"log_softmax"})
-        ],  optimizer="adagrad_v2",
+        ],  optimizer="adagrad",
             loss="SparseCategoricalCrossentropy"
     ):
 
     layers = [eval(f"keras.layers.{layerName}") (**parm) for (layerName, parm) in layersArgs]
     model = keras.Sequential([
-                keras.layers.InputLayer((28,28)), #TODO: colocar batch_size como parametro do algoritmo genetico
+                keras.layers.InputLayer((28,28)), 
                 keras.layers.Flatten(),
                 *layers,
                 keras.layers.Softmax()
